@@ -1,0 +1,48 @@
+import robot
+
+def main():
+    red_found = False
+    green_found = False
+    blue_found = False
+    robot1 = robot.ARAP()
+    robot1.init_devices()
+    
+    while True:
+        robot1.reset_actuator_values()
+        range = robot1.get_sensor_input()
+        robot1.blink_leds()
+        red, green, blue = robot1.get_camera_image(5)
+        
+        if red > green and red > blue and not red_found:
+            print("I see red")
+            red_found = True
+            print_summary(red_found, green_found, blue_found)
+        elif blue > red and blue > green and not blue_found:
+            print("I see blue")
+            blue_found = True
+            print_summary(red_found, green_found, blue_found)
+        elif green > red and green > blue and not green_found:
+            print("I see green")
+            green_found = True
+            print_summary(red_found, green_found, blue_found)
+        
+        if robot1.front_obstacles_detected():
+            robot1.move_backward()
+            robot1.turn_left()
+        else:
+            robot1.run_braitenberg()
+        robot1.set_actuators()
+        robot1.step()
+
+def print_summary(red_found, green_found, blue_found):
+    summary = "Summary: "
+    if red_found:
+        summary += "Red "
+    if green_found:
+        summary += "Green "
+    if blue_found:
+        summary += "Blue "
+    print(summary)
+
+if __name__ == "__main__":
+    main()
